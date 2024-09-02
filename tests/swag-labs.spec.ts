@@ -1,30 +1,32 @@
 import { test, expect } from '@playwright/test';
+import { SwagLoginPage } from '../pages/SwagLoginPage';
+import { SwagStorePage } from '../pages/SwagStorePage';
 
 test('can login', async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/v1/');
+  await page.goto(SwagLoginPage.LOGIN_PAGE_URL);
 
-  await page.locator('data-test=username').fill('standard_user');
-  await page.locator('data-test=password').fill('secret_sauce');
-  await page.locator('id=login-button').click();
+  await page.locator(SwagLoginPage.USERNAME_INPUT).fill('standard_user');
+  await page.locator(SwagLoginPage.PASSWORD_INPUT).fill('secret_sauce');
+  await page.locator(SwagLoginPage.LOGIN_BUTTON).click();
 
-  await expect(page.locator('id=shopping_cart_container')).toBeVisible();
+  await expect(page.locator(SwagStorePage.SHOPPING_CART_CONTAINER)).toBeVisible();
 });
 
 test('can add to cart and complete purchase', async ({ page }) => {
-  await page.goto('https://www.saucedemo.com/v1/inventory.html');
+  await page.goto(SwagStorePage.INVENTORY_PAGE_URL);
 
-  await page.getByRole('button', { name: /ADD TO CART/i }).nth(1).click();
+  await page.getByRole('button', { name: SwagStorePage.ADD_TO_CART_REGEX }).nth(1).click();
 
-  await page.locator('[href*="./cart.html"]').click();
-  await page.locator('[href*="./checkout-step-one.html"]').click();
+  await page.locator(SwagStorePage.CART_LINK).click();
+  await page.locator(SwagStorePage.CHECKOUT_STEP_ONE_LINK).click();
   
-  await page.locator('data-test=firstName').fill('Hannibal');
-  await page.locator('data-test=lastName').fill('Lecter');
-  await page.locator('data-test=postalCode').fill('12345');
-  await page.getByRole('button', { name: 'CONTINUE' }).click();
+  await page.locator(SwagStorePage.FIRST_NAME_INPUT).fill('Hannibal');
+  await page.locator(SwagStorePage.LAST_NAME_INPUT).fill('Lecter');
+  await page.locator(SwagStorePage.POSTAL_CODE_INPUT).fill('12345');
+  await page.getByRole('button', { name: SwagStorePage.CONTINUE_BUTTON_VALUE }).click();
 
-  await expect(page.locator('xpath=//*[@id="checkout_summary_container"]//*[@class="summary_quantity"]')).toContainText('1')
-  await page.getByRole('link', { name: 'FINISH' }).click();
+  await expect(page.locator(SwagStorePage.SUMMARY_QUANTITY_XPATH)).toContainText('1');
+  await page.getByRole('link', { name: SwagStorePage.FINISH_BUTTON_VALUE }).click();
   
-  await expect(page.locator('id=checkout_complete_container')).toBeVisible();
+  await expect(page.locator(SwagStorePage.CHECKOUT_COMPLETE_CONTAINER)).toBeVisible()
 });
