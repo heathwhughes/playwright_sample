@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
-import { SwagLoginPage } from '../pages/SwagLoginPage';
-import { SwagStorePage } from '../pages/SwagStorePage';
+import { SwagLoginPage } from '../../pages/SwagLabs/SwagLoginPage';
+import { SwagStorePage } from '../../pages/SwagLabs/SwagStorePage';
 
 test('can login', async ({ page }) => {
   await page.goto(SwagLoginPage.LOGIN_PAGE_URL);
