@@ -1,15 +1,46 @@
-export class SwagStorePage {
-    static readonly INVENTORY_PAGE_URL = 'https://www.saucedemo.com/v1/inventory.html';
-    static readonly SHOPPING_CART_CONTAINER = 'id=shopping_cart_container';
-    static readonly ADD_TO_CART_REGEX = /ADD TO CART/i;
-    static readonly CART_LINK = '[href*="./cart.html"]';
-    static readonly CHECKOUT_STEP_ONE_LINK = '[href*="./checkout-step-one.html"]';
-    static readonly FIRST_NAME_INPUT = 'data-test=firstName';
-    static readonly LAST_NAME_INPUT = 'data-test=lastName';
-    static readonly POSTAL_CODE_INPUT = 'data-test=postalCode';
-    static readonly CONTINUE_BUTTON_VALUE = 'CONTINUE';
-    static readonly SUMMARY_QUANTITY_XPATH = 'xpath=//*[@id="checkout_summary_container"]//*[@class="summary_quantity"]';
-    static readonly FINISH_BUTTON_VALUE = 'FINISH';
-    static readonly CHECKOUT_COMPLETE_CONTAINER = 'id=checkout_complete_container';
+import { BasePage } from '../BasePage';
+import { expect } from '@playwright/test';
+
+export class SwagStorePage extends BasePage {
+  readonly shoppingCartContainer = 'id=shopping_cart_container';
+  readonly addToCartRegex = /ADD TO CART/i;
+  readonly cartLink = 'data-test=shopping-cart-link';
+  readonly checkoutStepOneLink = 'data-test=checkout';
+  readonly firstNameInput = 'data-test=firstName';
+  readonly lastNameInput = 'data-test=lastName';
+  readonly postalCodeInput = 'data-test=postalCode';
+  readonly continueButtonValue = 'CONTINUE';
+  readonly summaryQuantityXpath = 'xpath=//*[@data-test="item-quantity"]';
+  readonly finishButton = 'data-test=finish';
+  readonly checkoutCompleteContainer = 'id=checkout_complete_container';
+
+  async goToInventoryPage() {
+    await this.page.goto('https://www.saucedemo.com/inventory.html');
   }
+
+  async addItemToCart(index: number) {
+    await this.page.getByRole('button', { name: this.addToCartRegex }).nth(index).click();
+  }
+
+  async checkout(firstName: string, lastName: string, postalCode: string) {
+    await this.page.locator(this.cartLink).click();
+    await this.page.locator(this.checkoutStepOneLink).click();
+    await this.page.locator(this.firstNameInput).fill(firstName);
+    await this.page.locator(this.lastNameInput).fill(lastName);
+    await this.page.locator(this.postalCodeInput).fill(postalCode);
+    await this.page.getByRole('button', { name: this.continueButtonValue }).click();
+  }
+
+  async verifyOneItemInCart() {
+    await expect(this.page.locator(this.summaryQuantityXpath)).toHaveText('1');
+  }
+
+  async clickFinish() {
+    await this.page.locator(this.finishButton).click();
+  }
+
+  async verifyCheckoutComplete() {
+    await expect(this.page.locator(this.checkoutCompleteContainer)).toBeVisible()
+  }
+}
   
